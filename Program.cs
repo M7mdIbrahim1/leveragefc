@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
                       .AllowAnyHeader()
                       .AllowAnyMethod());
                  options.AddPolicy(name: "DevOrigins", builder =>
-                     builder.WithOrigins("https://localhost:3000", "http://localhost:3000")
+                     builder.WithOrigins("https://leveragefc-backend.onrender.com:8080", "http://leveragefc-backend.onrender.com:8080")
                      .AllowAnyHeader()
                      .AllowAnyMethod()
                      .AllowCredentials());
