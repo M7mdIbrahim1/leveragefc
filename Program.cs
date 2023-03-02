@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
                       .AllowAnyHeader()
                       .AllowAnyMethod());
                  options.AddPolicy(name: "DevOrigins", builder =>
-                     builder.WithOrigins("https://leveragefc-backend.onrender.com:8080", "http://leveragefc-backend.onrender.com:8080")
+                     builder.WithOrigins("https://localhost:3000", "http://localhost:3000")
                      .AllowAnyHeader()
                      .AllowAnyMethod()
                      .AllowCredentials());
@@ -89,7 +89,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("DevOrigins");
+app.UseCors("ProdOrigins");
 
 //app.UseHttpsRedirection();
 
