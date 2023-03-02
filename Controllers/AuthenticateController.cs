@@ -107,7 +107,8 @@ namespace Backend.Controllers
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
+                UserName = model.Username,
+                IsActive = true
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -140,7 +141,7 @@ namespace Backend.Controllers
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-
+                IsActive = true,
 
             };
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -163,7 +164,7 @@ namespace Backend.Controllers
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
 
-        [Authorize(Roles = UserRoles.SuperAdmin + ", " + UserRoles.User)]
+        // [Authorize(Roles = UserRoles.SuperAdmin + ", " + UserRoles.User)]
         [HttpPost]
         [Route("register-superadmin")]
         public async Task<IActionResult> RegisterSuperAdmin([FromBody] RegisterViewModel model)
@@ -177,7 +178,7 @@ namespace Backend.Controllers
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-
+                IsActive = true,
 
             };
             var result = await _userManager.CreateAsync(user, model.Password);

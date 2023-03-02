@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "lfU1CiQ39ZaBTcJPGWyxDJND+3y5U34e6RuBDAF4aS0=",
+  "Hash": "6YAc3OzvLGaLscFuhl2BVLvp5IgvXHqt2JLHYmmA4Cg=",
   "Source": "Backend",
   "BasePath": "_content/Backend",
   "Mode": "Default",
@@ -610,6 +610,40 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/company54/Projects-Export (14).xls"
+    },
+    {
+      "Identity": "/Users/mohamedibrahim/Downloads/Projects/LeverageFc_WebPortal/Backend/wwwroot/company70/Opportunities-Export-Opportunities-CCT-Percentile-Retainer (1).xls",
+      "SourceId": "Backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/mohamedibrahim/Downloads/Projects/LeverageFc_WebPortal/Backend/wwwroot/",
+      "BasePath": "_content/Backend",
+      "RelativePath": "company70/Opportunities-Export-Opportunities-CCT-Percentile-Retainer (1).xls",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/company70/Opportunities-Export-Opportunities-CCT-Percentile-Retainer (1).xls"
+    },
+    {
+      "Identity": "/Users/mohamedibrahim/Downloads/Projects/LeverageFc_WebPortal/Backend/wwwroot/company70/Opportunities-Export-Opportunities-CCT-Percentile-Retainer.xls",
+      "SourceId": "Backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/mohamedibrahim/Downloads/Projects/LeverageFc_WebPortal/Backend/wwwroot/",
+      "BasePath": "_content/Backend",
+      "RelativePath": "company70/Opportunities-Export-Opportunities-CCT-Percentile-Retainer.xls",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/company70/Opportunities-Export-Opportunities-CCT-Percentile-Retainer.xls"
     },
     {
       "Identity": "/Users/mohamedibrahim/Downloads/Projects/LeverageFc_WebPortal/Backend/wwwroot/WhatsApp Image 2022-11-09 at 9.26.52 AM.jpeg",
