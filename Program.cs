@@ -89,7 +89,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("ProdOrigins");
+app.UseCors("DevOrigins");
 
 //app.UseHttpsRedirection();
 
