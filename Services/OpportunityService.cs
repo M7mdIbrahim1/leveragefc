@@ -128,14 +128,14 @@ namespace Backend.Services
                     }
                     else
                     {
-                        newOpportunity.LineOfBusiness = new LineOfBusiness()
-                        {
-                            Id = lob.Id.Value,
-                            Name = lob.Name,
-                            Description = lob.Description
-                        };
+                        // newOpportunity.LineOfBusiness = new LineOfBusiness()
+                        // {
+                        //     Id = lob.Id.Value,
+                        //     Name = lob.Name,
+                        //     Description = lob.Description
+                        // };
                         newOpportunity.LineOfBusinessId = lob.Id.Value;
-                        newOpportunity.LineOfBusiness = null;
+                        //  newOpportunity.LineOfBusiness = null;
                     }
                     if (client == null)
                     {
