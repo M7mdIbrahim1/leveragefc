@@ -29,12 +29,14 @@ namespace Backend.Services
 
         private readonly ApplicationDbContext dbContext;
 
-        public CompanyService(UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, IMapper mapper)//, ILineOfBusinessService lobService) //IRepository<Company> companyRepository)
+        // private readonly IClient clientService;
+
+        public CompanyService(UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, IMapper mapper)//, IClientService clientService)//, ILineOfBusinessService lobService) //IRepository<Company> companyRepository)
         {
             this.mapper = mapper;
             this.dbContext = dbContext;
             this._userManager = userManager;
-            //   this.lobService = lobService;
+            // this.clientService = clientService;
             //   this.companyRepository= companyRepository;
         }
         public async Task<ApiResponse<bool>> AddCompany(CompanyViewModel model, ApplicationUser? user)
@@ -270,7 +272,7 @@ namespace Backend.Services
 
             var companysCount = (await new CompanyRepository(dbContext).GetListAsync(predicate3, null, p => p.LineOfBusinesses)).Count();
 
-            var companys = await new CompanyRepository(dbContext).GetListAsync(predicate3, paging, p => p.LineOfBusinesses, p => p.LineOfBusinesses.Select(x => x.Clients), p => p.Files, p => p.CompanyGroups);
+            var companys = await new CompanyRepository(dbContext).GetListAsync(predicate3, paging, p => p.LineOfBusinesses, p => p.LineOfBusinesses.Select(x => x.Milestones), p => p.LineOfBusinesses.Select(x => x.Clients), p => p.Files, p => p.CompanyGroups);
             var model = new List<CompanyViewModel>();
 
             foreach (var company in companys)
@@ -322,6 +324,11 @@ namespace Backend.Services
                             Name = x.Name,
                             Description = x.Description,
                         }).ToList(),
+                        Milestones = x.Milestones.OrderBy(x => x.Index).Select(x => new Models.MilestoneViewModels.MilestoneViewModel()
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                        }).ToList()
                     }).ToList(),
 
                     //  Contact = company.Contact,
@@ -484,6 +491,195 @@ namespace Backend.Services
                 });
             }
             return lineOfBusinessesViewModel;
+
+        }
+
+        private Client returnNewClient(string name, ApplicationUser user, ICollection<Client> clients = null)
+        {
+            if (clients != null && clients.Count > 0)
+            {
+                var client = clients.FirstOrDefault(x => x.Name == name);
+                if (client != null)
+                {
+                    return client;
+                }
+                else
+                {
+                    return new Client
+                    {
+                        Name = name,
+                        Description = "imported through excel",
+                        ChangeSequenceNumber = 0,
+                        CreatedDate = DateTime.Now,
+                        UpdatedDate = DateTime.Now,
+                        CreatorUserId = user.Id,
+                        LastUpdateUserId = user.Id,
+                        IsDeleted = false,
+                        IsActive = true,
+                    };
+                }
+            }
+            else
+            {
+                return new Client
+                {
+                    Name = name,
+                    Description = "imported through excel",
+                    ChangeSequenceNumber = 0,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    CreatorUserId = user.Id,
+                    LastUpdateUserId = user.Id,
+                    IsDeleted = false,
+                    IsActive = true,
+                };
+            }
+        }
+
+        private Milestone returnNewMilestone(string name, ApplicationUser user, int i)
+        {
+            return new Milestone
+            {
+                Name = name,
+                Description = "imported through excel",
+                NeedPayment = false,
+                ChangeSequenceNumber = 0,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now,
+                CreatorUserId = user.Id,
+                LastUpdateUserId = user.Id,
+                IsDeleted = false,
+                IsActive = true,
+                Index = i + 1,
+            };
+        }
+
+        private ICollection<string> GetAllClientsNames(ICollection<CompanyViewModel> models)
+        {
+            var names = new List<string>();
+            foreach (var model in models)
+            {
+                foreach (var lob in model.LineOfBusinesses)
+                {
+                    foreach (var client in lob.Clients)
+                    {
+                        names.Add(client.Name);
+                    }
+                }
+            }
+            return names;
+        }
+
+        public async Task<ICollection<ApiResponse<bool>>> ImportCompanies(ICollection<CompanyViewModel> models, ApplicationUser? user)
+        {
+            // var clients = await clientService.GetClientByNames(GetAllClientsNames(models));
+            var clientNames = GetAllClientsNames(models);
+            var clients = (await new ClientRepository(dbContext).GetListAsync(c => clientNames.Contains(c.Name), null, p => p.LineOfBusinesses, p => p.LineOfBusinesses.Select(x => x.Company))).ToList();
+            var result = new List<ApiResponse<bool>>();
+            foreach (var model in models)
+            {
+                var comp = await new CompanyRepository(dbContext).GetAsync(a => a.Name == model.Name, null, true, p => p.LineOfBusinesses, p => p.LineOfBusinesses.Select(x => x.Clients), p => p.LineOfBusinesses.Select(x => x.Milestones));
+                if (comp != null)
+                {
+                    foreach (var lob in model.LineOfBusinesses)
+                    {
+                        var dbLob = comp.LineOfBusinesses.Where(x => x.Name == lob.Name).FirstOrDefault();
+                        if (dbLob != null)
+                        {
+                            foreach (var client in lob.Clients)
+                            {
+                                if (!dbLob.Clients.Any(x => x.Name == client.Name))
+                                {
+                                    dbLob.Clients.Add(returnNewClient(client.Name, user));
+                                }
+                            }
+                            int i = 0;
+                            foreach (var milestone in lob.Milestones)
+                            {
+
+                                if (!dbLob.Milestones.Any(x => x.Name == milestone.Name))
+                                {
+                                    dbLob.Milestones.Add(returnNewMilestone(milestone.Name, user, dbLob.Milestones.Count - 1 + i));
+                                    i++;
+                                }
+
+                            }
+
+                        }
+                        else
+                        {
+                            comp.LineOfBusinesses.Add(new LineOfBusiness
+                            {
+                                Name = lob.Name,
+                                Description = "imported through excel",
+                                Clients = lob.Clients.Select(x => returnNewClient(x.Name, user, clients)).ToList(),
+                                Milestones = lob.Milestones.Select((x, i) => returnNewMilestone(x.Name, user, i)).ToList(),
+                                ChangeSequenceNumber = 0,
+                                CreatedDate = DateTime.Now,
+                                UpdatedDate = DateTime.Now,
+                                CreatorUserId = user.Id,
+                                LastUpdateUserId = user.Id,
+                                IsDeleted = false,
+                                IsActive = true,
+                                IsRetainer = false,
+                            });
+                        }
+
+                        var isUpdated = await new CompanyRepository(dbContext).UpdateAsync(comp, comp.Id, user);
+
+                        if (!isUpdated)
+                        {
+                            result.Add(new ApiResponse<bool>(false, "Error was occurred! the company was not updated", false));
+                        }
+                        else
+                        {
+                            result.Add(new ApiResponse<bool>(true, "Company updated successfully", true));
+                        }
+                    }
+
+                }
+                else
+                {
+                    var company = new Company
+                    {
+                        Name = model.Name,
+                        Description = "imported through excel",
+                        OwnerId = user.Id,
+                        LineOfBusinesses = model.LineOfBusinesses.Select(x => new LineOfBusiness
+                        {
+                            Name = x.Name,
+                            Description = "imported through excel",
+                            Clients = x.Clients.Select(y => returnNewClient(y.Name, user, clients)).ToList(),
+                            Milestones = x.Milestones.Select((y, i) => returnNewMilestone(y.Name, user, i)).ToList(),
+                            ChangeSequenceNumber = 0,
+                            CreatedDate = DateTime.Now,
+                            UpdatedDate = DateTime.Now,
+                            CreatorUserId = user.Id,
+                            LastUpdateUserId = user.Id,
+                            IsDeleted = false,
+                            IsActive = true,
+                            IsRetainer = false,
+                        }).ToList(),
+                        ChangeSequenceNumber = 0,
+                        CreatedDate = DateTime.Now,
+                        UpdatedDate = DateTime.Now,
+                        CreatorUserId = user.Id,
+                        LastUpdateUserId = user.Id,
+                        IsDeleted = false,
+                        IsActive = true,
+                    };
+
+                    var addedCompany = await new CompanyRepository(dbContext).AddAsync(company, user);
+
+                    if (addedCompany == null)
+                    {
+                        result.Add(new ApiResponse<bool>(false, "Error in creating company", false));
+                    }
+                    result.Add(new ApiResponse<bool>(true, "Company was created successfully", true));
+
+                }
+            }
+            return result;
 
         }
 

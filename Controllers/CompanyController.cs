@@ -95,5 +95,14 @@ namespace Backend.Controllers
             return await companyService.UpdateCompany(updateCompany, user);
         }
 
+        [Authorize(Roles = UserRoles.SuperAdmin + ", " + UserRoles.FDBAdmin)]
+        [HttpPost]
+        [Route(nameof(ImportCompanies))]
+        public async Task<ICollection<ApiResponse<bool>>> ImportCompanies(ICollection<CompanyViewModel> models)
+        {
+            var user = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+            return await companyService.ImportCompanies(models, user);
+        }
+
     }
 }

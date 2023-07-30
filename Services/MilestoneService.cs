@@ -38,7 +38,8 @@ namespace Backend.Services
                 Description = model.Description,
                 LineOfBusinessId = model.LineOfBusinessId.Value,
                 NeedPayment = model.NeedPayment.HasValue ? model.NeedPayment.Value : false,
-                DefaultAmountValue = model.NeedPayment.HasValue ? model.DefaultAmountValue : 0
+                DefaultAmountValue = model.NeedPayment.HasValue ? model.DefaultAmountValue : 0,
+                Index = model.Index,
                 //   Contact = model.Contact
             }, user);
             if (milestone == null)
@@ -61,6 +62,7 @@ namespace Backend.Services
             milestone.LineOfBusinessId = updatedMilestone.LineOfBusinessId.Value;
             milestone.NeedPayment = updatedMilestone.NeedPayment.Value;
             milestone.DefaultAmountValue = updatedMilestone.DefaultAmountValue;
+            milestone.Index = updatedMilestone.Index;
             // milestone.Contact = updatedMilestone.Contact;
 
             var isUpdated = await new MilestoneRepository(dbContext).UpdateAsync(milestone, milestone.Id, user);
@@ -97,7 +99,7 @@ namespace Backend.Services
 
         public async Task<ICollection<Milestone>> GetLOBMilestones(int lobId)
         {
-            var milestones = (await new MilestoneRepository(dbContext).GetListAsync(x => x.LineOfBusinessId == lobId)).ToList();
+            var milestones = (await new MilestoneRepository(dbContext).GetListAsync(x => x.LineOfBusinessId == lobId)).OrderBy(x => x.Index).ToList();
             return milestones;
         }
 
@@ -168,7 +170,7 @@ namespace Backend.Services
             var milestoneCount = (await new MilestoneRepository(dbContext).GetListAsync(predicate3, null)).Count();
 
 
-            var milestones = await new MilestoneRepository(dbContext).GetListAsync(predicate3, paging, p => p.LineOfBusiness, p => p.LineOfBusiness.Company);
+            var milestones = (await new MilestoneRepository(dbContext).GetListAsync(predicate3, paging, p => p.LineOfBusiness, p => p.LineOfBusiness.Company)).OrderBy(x => x.Index);
             var model = new List<MilestoneViewModel>();
             foreach (var milestone in milestones)
             {
@@ -190,6 +192,7 @@ namespace Backend.Services
                     },
                     NeedPayment = milestone.NeedPayment,
                     DefaultAmountValue = milestone.DefaultAmountValue,
+                    Index = milestone.Index,
                     TotalCount = milestoneCount
                 });
             }

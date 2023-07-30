@@ -19,6 +19,8 @@ namespace Backend.Models
         public bool NeedPayment { get; set; }
         public decimal? DefaultAmountValue { get; set; }
 
+        public int? Index { get; set; }
+
 
 
     }

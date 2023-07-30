@@ -310,7 +310,7 @@ namespace Backend.Services
 
         public async Task<LineOfBusinessViewModel> GetLOBByName(string lobName, string compName)
         {
-            List<LineOfBusiness> lineOfBusinesses = (await new LineOfBusinessRepository(dbContext).GetListAsync(c => c.Name == lobName, null, p => p.Company, p => p.Milestones)).ToList();
+            List<LineOfBusiness> lineOfBusinesses = (await new LineOfBusinessRepository(dbContext).GetListAsync(c => c.Name == lobName, null, p => p.Company, p => p.Clients, p => p.Milestones)).ToList();
 
             if (lineOfBusinesses != null && lineOfBusinesses.Count > 0)
             {

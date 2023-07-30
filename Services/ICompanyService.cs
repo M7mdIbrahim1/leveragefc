@@ -18,5 +18,6 @@ namespace Backend.Services
         Task<ApiResponse<bool>> AddCompany(CompanyViewModel model, ApplicationUser? user);
         Task<ApiResponse<bool>> DeleteCompany(CompanyViewModel deleteCompany, ApplicationUser? user);
         Task<ApiResponse<bool>> UpdateCompany(CompanyViewModel updateCompany, ApplicationUser? user);
+        Task<ICollection<ApiResponse<bool>>> ImportCompanies(ICollection<CompanyViewModel> models, ApplicationUser? user);
     }
 }

@@ -359,41 +359,55 @@ namespace Backend.Services
 
         }
 
-        public async Task<ClientViewModel> GetClientByName(string clientName)
-        {
-            var client = await new ClientRepository(dbContext).GetAsync(c => c.Name == clientName, null, false, p => p.LineOfBusinesses, p => p.LineOfBusinesses.Select(x => x.Company));
-            if (client != null)
-            {
 
+        public async Task<ICollection<Client>> GetClientByNames(ICollection<string> clientNames)
+        {
+            var clients = (await new ClientRepository(dbContext).GetListAsync(c => clientNames.Contains(c.Name), null, p => p.LineOfBusinesses, p => p.LineOfBusinesses.Select(x => x.Company))).ToList();
+            return clients;
+        }
+
+        public async Task<ClientViewModel> GetClientByName(string clientName, int lobId)
+        {
+            var clients = (await new ClientRepository(dbContext).GetListAsync(c => c.Name == clientName, null, p => p.LineOfBusinesses, p => p.LineOfBusinesses.Select(x => x.Company))).ToList();
+            if (clients != null && clients.Count > 0)
+            {
+                var client = clients.Where(x => x.LineOfBusinesses.Any(y => y.Id == lobId)).FirstOrDefault();
                 //var clientViewModel = mapper.Map<ClientViewModel>(client);
-                return new ClientViewModel
+                if (client != null)
                 {
-                    Id = client.Id,
-                    Name = client.Name,
-                    Description = client.Description,
-                    // LineOfBusinessId = client.LineOfBusinessId,
-                    LineOfBusinesses = returnLineOfBusinessesViewModels(client.LineOfBusinesses),
-                    AddressLine1 = client.AddressLine1,
-                    AddressLine2 = client.AddressLine2,
-                    ContactNumber = client.ContactNumber,
-                    ContactPerson = client.ContactPerson,
-                    State = client.State,
-                    City = client.City,
-                    Country = client.Country,
-                    TaxCardNumber = client.TaxCardNumber,
-                    //TaxCardNumberPath = client.TaxCardNumberPath,
-                    CommercialRegistrationNumber = client.CommercialRegistrationNumber,
-                    //CommercialRegistrationNumberPath = client.CommercialRegistrationNumberPath,
-                    Email = client.Email,
-                    PostCode = client.PostCode,
-                    Files = client.Files.Select(x => new FileViewModel()
+                    return new ClientViewModel
                     {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Url = x.Url,
-                        Status = x.Status
-                    }).ToList(),
-                };
+                        Id = client.Id,
+                        Name = client.Name,
+                        Description = client.Description,
+                        // LineOfBusinessId = client.LineOfBusinessId,
+                        LineOfBusinesses = returnLineOfBusinessesViewModels(client.LineOfBusinesses),
+                        AddressLine1 = client.AddressLine1,
+                        AddressLine2 = client.AddressLine2,
+                        ContactNumber = client.ContactNumber,
+                        ContactPerson = client.ContactPerson,
+                        State = client.State,
+                        City = client.City,
+                        Country = client.Country,
+                        TaxCardNumber = client.TaxCardNumber,
+                        //TaxCardNumberPath = client.TaxCardNumberPath,
+                        CommercialRegistrationNumber = client.CommercialRegistrationNumber,
+                        //CommercialRegistrationNumberPath = client.CommercialRegistrationNumberPath,
+                        Email = client.Email,
+                        PostCode = client.PostCode,
+                        Files = client.Files.Select(x => new FileViewModel()
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            Url = x.Url,
+                            Status = x.Status
+                        }).ToList(),
+                    };
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {

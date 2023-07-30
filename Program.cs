@@ -14,8 +14,8 @@ ConfigurationManager configuration = builder.Configuration;
 // Add services to the container.
 
 // For Entity Framework
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("LocalConnection")));
+//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("LocalConnection")));
 
 // For Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -91,8 +91,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("ProdOrigins");
-//app.UseCors("DevOrigins");
+//app.UseCors("ProdOrigins");
+app.UseCors("DevOrigins");
 
 //app.UseHttpsRedirection();
 

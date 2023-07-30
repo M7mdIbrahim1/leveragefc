@@ -15,5 +15,7 @@ namespace Backend.Models.MilestoneViewModels
         public decimal? DefaultAmountValue { get; set; }
 
         public int? TotalCount { get; set; }
+
+        public int? Index { get; set; }
     }
 }

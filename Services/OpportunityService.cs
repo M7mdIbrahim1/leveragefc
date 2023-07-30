@@ -45,172 +45,185 @@ namespace Backend.Services
             {
                 try
                 {
-                    var newOpportunity = new Opportunity
-                    {
-                        ProjectName = model.ProjectName,
-                        //LineOfBusinessId = model.LineOfBusinessId.Value,
 
-                        Status = model.Status.Value,
-                        Scope = model.Scope.Value,
-                        Source = model.Source.Value,
-
-                        // ClientStatus = model.ClientStatus.Value,
-                        FirstContactDate = model.FirstContactDate,
-                        Note = model.Note,
-
-
-                        FirstProposalDate = model.FirstProposalDate,
-                        FirstProposalValue = model.FirstProposalValue,
-                        FirstProposalValueCurrency = model.FirstProposalValueCurrency,
-
-                        CurrentProposalValue = model.CurrentProposalValue,
-                        CurrentProposalValueCurrency = model.CurrentProposalValueCurrency,
-
-                        ContractSignatureDate = model.ContractSignatureDate,
-                        FinalContractValue = model.FinalContractValue,
-                        FinalContractValueCurrency = model.FinalContractValueCurrency,
-                        RetainerValidatity = model.RetainerValidatity,
-                        //   Contact = model.Contact
-                    };
-                    var company = await companyService.GetCompanyByName(model.LineOfBusiness.Company.Name);
                     var lob = await lobService.GetLOBByName(model.LineOfBusiness.Name, model.LineOfBusiness.Company.Name);
-                    var client = await clientService.GetClientByName(model.Client.Name);
-                    if (company == null)
+                    var client = await clientService.GetClientByName(model.Client.Name, lob.Id.Value);
+                    if (lob != null && client != null)
                     {
-                        newOpportunity.LineOfBusiness = new LineOfBusiness()
+                        var newOpportunity = new Opportunity
                         {
-                            Name = model.LineOfBusiness.Name,
-                            Description = "Imported through excel",
-                            ChangeSequenceNumber = 0,
-                            CreatedDate = DateTime.Now,
-                            UpdatedDate = DateTime.Now,
-                            CreatorUserId = user.Id,
-                            LastUpdateUserId = user.Id,
-                            IsDeleted = false,
-                            IsActive = true,
-                            Company = new Company()
-                            {
-                                Name = model.LineOfBusiness.Company.Name,
-                                Description = "Imported through excel",
-                                OwnerId = "cc2b0840-0804-4ea1-ac39-b41575bf14d4",
-                                ChangeSequenceNumber = 0,
-                                CreatedDate = DateTime.Now,
-                                UpdatedDate = DateTime.Now,
-                                CreatorUserId = user.Id,
-                                LastUpdateUserId = user.Id,
-                                IsDeleted = false,
-                                IsActive = true,
-                            }
+                            ProjectName = model.ProjectName,
+                            //LineOfBusinessId = model.LineOfBusinessId.Value,
+
+                            Status = model.Status.Value,
+                            Scope = model.Scope.Value,
+                            Source = model.Source.Value,
+
+                            // ClientStatus = model.ClientStatus.Value,
+                            FirstContactDate = model.FirstContactDate,
+                            Note = model.Note,
+
+
+                            FirstProposalDate = model.FirstProposalDate,
+                            FirstProposalValue = model.FirstProposalValue,
+                            FirstProposalValueCurrency = model.FirstProposalValueCurrency,
+
+                            CurrentProposalValue = model.CurrentProposalValue,
+                            CurrentProposalValueCurrency = model.CurrentProposalValueCurrency,
+
+                            ContractSignatureDate = model.ContractSignatureDate,
+                            FinalContractValue = model.FinalContractValue,
+                            FinalContractValueCurrency = model.FinalContractValueCurrency,
+                            RetainerValidatity = model.RetainerValidatity,
+                            LineOfBusinessId = lob.Id.Value,
+                            ClientId = client.Id.Value,
+                            ClientStatus = 1,
+                            //   Contact = model.Contact
                         };
-                    }
-                    else if (lob == null)
-                    {
-                        newOpportunity.LineOfBusiness = new LineOfBusiness()
-                        {
-                            Name = model.LineOfBusiness.Name,
-                            Description = "Imported through excel",
-                            ChangeSequenceNumber = 0,
-                            CreatedDate = DateTime.Now,
-                            UpdatedDate = DateTime.Now,
-                            CreatorUserId = user.Id,
-                            LastUpdateUserId = user.Id,
-                            IsDeleted = false,
-                            IsActive = true,
-                            CompanyId = company.Id.Value,
-                            // Company = new Company()
-                            // {
-                            //     //Id= company.Id.Value,
-                            //     Name = company.Name,
-                            //     Description = company.Description,
-                            //     IsActive = true,
-                            // }
-                        };
-                    }
-                    else
-                    {
-                        // newOpportunity.LineOfBusiness = new LineOfBusiness()
+                        //var company = await companyService.GetCompanyByName(model.LineOfBusiness.Company.Name);
+
+                        // if (company = null)
                         // {
-                        //     Id = lob.Id.Value,
-                        //     Name = lob.Name,
-                        //     Description = lob.Description
-                        // };
-                        newOpportunity.LineOfBusinessId = lob.Id.Value;
-                        //  newOpportunity.LineOfBusiness = null;
-                    }
-                    if (client == null)
-                    {
-                        // var lobs = new List<LineOfBusiness>();
-                        //var lobs = await GetLineOfBusinessByIds(model.Client.LineOfBusinesses.Select(x => x.Id.Value).ToList());
-                        //lobs.Add(lob);
-                        newOpportunity.ClientStatus = 0;
-                        newOpportunity.Client = new Client()
+                        //     newOpportunity.LineOfBusiness = new LineOfBusiness()
+                        //     {
+                        //         Name = model.LineOfBusiness.Name,
+                        //         Description = "Imported through excel",
+                        //         ChangeSequenceNumber = 0,
+                        //         CreatedDate = DateTime.Now,
+                        //         UpdatedDate = DateTime.Now,
+                        //         CreatorUserId = user.Id,
+                        //         LastUpdateUserId = user.Id,
+                        //         IsDeleted = false,
+                        //         IsActive = true,
+                        //         Company = new Company()
+                        //         {
+                        //             Name = model.LineOfBusiness.Company.Name,
+                        //             Description = "Imported through excel",
+                        //             OwnerId = "cc2b0840-0804-4ea1-ac39-b41575bf14d4",
+                        //             ChangeSequenceNumber = 0,
+                        //             CreatedDate = DateTime.Now,
+                        //             UpdatedDate = DateTime.Now,
+                        //             CreatorUserId = user.Id,
+                        //             LastUpdateUserId = user.Id,
+                        //             IsDeleted = false,
+                        //             IsActive = true,
+                        //         }
+                        //     };
+                        // }
+                        // else if (lob == null)
+                        // {
+                        //     newOpportunity.LineOfBusiness = new LineOfBusiness()
+                        //     {
+                        //         Name = model.LineOfBusiness.Name,
+                        //         Description = "Imported through excel",
+                        //         ChangeSequenceNumber = 0,
+                        //         CreatedDate = DateTime.Now,
+                        //         UpdatedDate = DateTime.Now,
+                        //         CreatorUserId = user.Id,
+                        //         LastUpdateUserId = user.Id,
+                        //         IsDeleted = false,
+                        //         IsActive = true,
+                        //         CompanyId = company.Id.Value,
+                        //         // Company = new Company()
+                        //         // {
+                        //         //     //Id= company.Id.Value,
+                        //         //     Name = company.Name,
+                        //         //     Description = company.Description,
+                        //         //     IsActive = true,
+                        //         // }
+                        //     };
+                        // }
+                        // else
+                        // {
+                        //     // newOpportunity.LineOfBusiness = new LineOfBusiness()
+                        //     // {
+                        //     //     Id = lob.Id.Value,
+                        //     //     Name = lob.Name,
+                        //     //     Description = lob.Description
+                        //     // };
+                        //     newOpportunity.LineOfBusinessId = lob.Id.Value;
+                        //     //  newOpportunity.LineOfBusiness = null;
+                        // }
+                        // if (client == null)
+                        // {
+                        //     // var lobs = new List<LineOfBusiness>();
+                        //     //var lobs = await GetLineOfBusinessByIds(model.Client.LineOfBusinesses.Select(x => x.Id.Value).ToList());
+                        //     //lobs.Add(lob);
+                        //     newOpportunity.ClientStatus = 0;
+                        //     newOpportunity.Client = new Client()
+                        //     {
+                        //         Name = model.Client.Name,
+                        //         Description = "Imported through excel",
+                        //         // LineOfBusinesses = new List<LineOfBusiness>(){
+                        //         // new LineOfBusiness(){
+                        //         //     Id = lob.Id.HasValue? lob.Id.Value:-1,
+                        //         //     Name = lob.Name,
+                        //         //     Description = lob.Description
+                        //         // }
+                        //         //},
+                        //         ChangeSequenceNumber = 0,
+                        //         CreatedDate = DateTime.Now,
+                        //         UpdatedDate = DateTime.Now,
+                        //         CreatorUserId = user.Id,
+                        //         LastUpdateUserId = user.Id,
+                        //         IsDeleted = false,
+                        //         IsActive = true,
+                        //     };
+                        //     if (lob != null)
+                        //     {
+                        //         newOpportunity.Client.LineOfBusinesses = new List<LineOfBusiness>(){ new LineOfBusiness(){
+                        //             Id = lob.Id.HasValue? lob.Id.Value:-1,
+                        //             Name = lob.Name,
+                        //           Description = lob.Description
+                        //          }
+                        //     };
+                        //     }
+                        //     else
+                        //     {
+                        //         newOpportunity.Client.LineOfBusinesses = new List<LineOfBusiness>(){
+                        //             newOpportunity.LineOfBusiness
+                        //         };
+                        //     }
+                        //     // lobs.Add(new LineOfBusiness()
+                        //     // {
+                        //     //     Id = model.LineOfBusinessId.Value,
+                        //     //     // Name = model.LineOfBusiness.Name,
+                        //     //     // Description = model.LineOfBusiness.Description,
+                        //     //     // CompanyId = model.LineOfBusiness.CompanyId.Value,
+                        //     //     // IsRetainer = model.LineOfBusiness.IsRetainer.Value,
+                        //     //     // IsActive = model.LineOfBusiness.IsActive.Value,
+                        //     //     // Clients = new List<Client>(){
+                        //     //     //     newOpportunity.Client
+                        //     //     // }
+                        //     // });
+
+
+                        //     // newOpportunity.Client.LineOfBusinesses = lobs;
+
+                        // }
+                        // else
+                        // {
+                        //     newOpportunity.ClientId = client.Id.Value;
+                        //     newOpportunity.ClientStatus = 1;
+                        //     newOpportunity.Client = null;
+                        // }
+                        //dbContext.ChangeTracker.Clear();
+
+                        var opportunity = await new OpportunityRepository(dbContext).AddAsync(newOpportunity, user);
+                        //dbContext.Entry(opportunity).State = EntityState.Detached;
+
+                        if (opportunity == null)
                         {
-                            Name = model.Client.Name,
-                            Description = "Imported through excel",
-                            // LineOfBusinesses = new List<LineOfBusiness>(){
-                            // new LineOfBusiness(){
-                            //     Id = lob.Id.HasValue? lob.Id.Value:-1,
-                            //     Name = lob.Name,
-                            //     Description = lob.Description
-                            // }
-                            //},
-                            ChangeSequenceNumber = 0,
-                            CreatedDate = DateTime.Now,
-                            UpdatedDate = DateTime.Now,
-                            CreatorUserId = user.Id,
-                            LastUpdateUserId = user.Id,
-                            IsDeleted = false,
-                            IsActive = true,
-                        };
-                        if (lob != null)
-                        {
-                            newOpportunity.Client.LineOfBusinesses = new List<LineOfBusiness>(){ new LineOfBusiness(){
-                            Id = lob.Id.HasValue? lob.Id.Value:-1,
-                            Name = lob.Name,
-                          Description = lob.Description
-                         }
-                    };
+                            result.Add(new ApiResponse<bool>(false, "DB-EF Error in creating opportunity", false));
                         }
                         else
                         {
-                            newOpportunity.Client.LineOfBusinesses = new List<LineOfBusiness>(){
-                            newOpportunity.LineOfBusiness
-                        };
+                            result.Add(new ApiResponse<bool>(true, "Opportunity created successfully", true));
                         }
-                        // lobs.Add(new LineOfBusiness()
-                        // {
-                        //     Id = model.LineOfBusinessId.Value,
-                        //     // Name = model.LineOfBusiness.Name,
-                        //     // Description = model.LineOfBusiness.Description,
-                        //     // CompanyId = model.LineOfBusiness.CompanyId.Value,
-                        //     // IsRetainer = model.LineOfBusiness.IsRetainer.Value,
-                        //     // IsActive = model.LineOfBusiness.IsActive.Value,
-                        //     // Clients = new List<Client>(){
-                        //     //     newOpportunity.Client
-                        //     // }
-                        // });
-
-
-                        // newOpportunity.Client.LineOfBusinesses = lobs;
-
                     }
                     else
                     {
-                        newOpportunity.ClientId = client.Id.Value;
-                        newOpportunity.ClientStatus = 1;
-                        newOpportunity.Client = null;
-                    }
-                    //dbContext.ChangeTracker.Clear();
-                    var opportunity = await new OpportunityRepository(dbContext).AddAsync(newOpportunity, user);
-                    //dbContext.Entry(opportunity).State = EntityState.Detached;
-
-                    if (opportunity == null)
-                    {
-                        result.Add(new ApiResponse<bool>(false, "DB-EF Error in creating opportunity", false));
-                    }
-                    else
-                    {
-                        result.Add(new ApiResponse<bool>(true, "Opportunity created successfully", true));
+                        result.Add(new ApiResponse<bool>(false, "Line of business or client not defined", false));
                     }
                 }
                 catch (Exception ex)

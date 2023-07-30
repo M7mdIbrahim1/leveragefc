@@ -392,7 +392,7 @@ namespace Backend.Services
                             Id = project.LineOfBusiness.Company.Id,
                             Name = project.LineOfBusiness.Company.Name,
                         },
-                        Milestones = project.LineOfBusiness.Milestones.Select(x => new MilestoneViewModel()
+                        Milestones = project.LineOfBusiness.Milestones.OrderBy(x => x.Index).Select(x => new MilestoneViewModel()
                         {
                             Id = x.Id,
                             Name = x.Name,
@@ -401,7 +401,7 @@ namespace Backend.Services
                         }).ToList()
                     },
                     CurrentProjectMilestoneId = project.CurrentProjectMilestoneId,
-                    ProjectMilestones = project.ProjectMilestones.Select(x => new ProjectMilestoneViewModel()
+                    ProjectMilestones = project.ProjectMilestones.OrderBy(x => x.MilestoneIndex).Select(x => new ProjectMilestoneViewModel()
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -488,7 +488,7 @@ namespace Backend.Services
                             Name = project.LineOfBusiness.Company.Name,
                         }
                         ,
-                        Milestones = project.LineOfBusiness.Milestones.Select(x => new MilestoneViewModel()
+                        Milestones = project.LineOfBusiness.Milestones.OrderBy(x => x.Index).Select(x => new MilestoneViewModel()
                         {
                             Id = x.Id,
                             Name = x.Name,
@@ -587,7 +587,7 @@ namespace Backend.Services
                             Id = project.LineOfBusiness.Company.Id,
                             Name = project.LineOfBusiness.Company.Name,
                         },
-                        Milestones = project.LineOfBusiness.Milestones.Select(x => new MilestoneViewModel()
+                        Milestones = project.LineOfBusiness.Milestones.OrderBy(x => x.Index).Select(x => new MilestoneViewModel()
                         {
                             Id = x.Id,
                             Name = x.Name,
@@ -656,7 +656,11 @@ namespace Backend.Services
             var result = new List<bool>();
             foreach (var model in models)
             {
-                try
+                // try
+                // {
+                var lob = await lobService.GetLOBByName(model.LineOfBusiness.Name, model.LineOfBusiness.Company.Name);
+                var client = await clientService.GetClientByName(model.Client.Name, lob.Id.Value);
+                if (lob != null && client != null)
                 {
                     var newProject = new Project
                     {
@@ -681,6 +685,10 @@ namespace Backend.Services
                         //OpportunityId = model.OpportunityId.Value;
                         //Opportunity = GetOpportunity(model),
                         Note = model.Note,
+                        LineOfBusinessId = lob.Id.Value,
+                        ClientId = client.Id.Value,
+                        CurrentProjectMilestoneIndex = model.CurrentProjectMilestoneIndex,
+                        MilestoneCount = model.ProjectMilestones != null ? model.ProjectMilestones.Count : 0,
                         // ProjectMilestoneId = model.ProjectMilestoneId.Value;
 
 
@@ -688,135 +696,134 @@ namespace Backend.Services
 
 
 
-                    var company = await companyService.GetCompanyByName(model.LineOfBusiness.Company.Name);
-                    var lob = await lobService.GetLOBByName(model.LineOfBusiness.Name, model.LineOfBusiness.Company.Name);
-                    var client = await clientService.GetClientByName(model.Client.Name);
-                    if (company == null)
-                    {
-                        newProject.LineOfBusiness = new LineOfBusiness()
-                        {
-                            Name = model.LineOfBusiness.Name,
-                            Description = "Imported through excel",
-                            ChangeSequenceNumber = 0,
-                            CreatedDate = DateTime.Now,
-                            UpdatedDate = DateTime.Now,
-                            CreatorUserId = user.Id,
-                            LastUpdateUserId = user.Id,
-                            IsDeleted = false,
-                            IsActive = true,
-                            Milestones = GetMilestones(model.ProjectMilestones, user),
-                            Company = new Company()
-                            {
-                                Name = model.LineOfBusiness.Company.Name,
-                                Description = "Imported through excel",
-                                OwnerId = "cc2b0840-0804-4ea1-ac39-b41575bf14d4",
-                                ChangeSequenceNumber = 0,
-                                CreatedDate = DateTime.Now,
-                                UpdatedDate = DateTime.Now,
-                                CreatorUserId = user.Id,
-                                LastUpdateUserId = user.Id,
-                                IsDeleted = false,
-                                IsActive = true,
-                            }
-                        };
-                    }
-                    else if (lob == null)
-                    {
-                        newProject.LineOfBusiness = new LineOfBusiness()
-                        {
-                            Name = model.LineOfBusiness.Name,
-                            Description = "Imported through excel",
-                            ChangeSequenceNumber = 0,
-                            CreatedDate = DateTime.Now,
-                            UpdatedDate = DateTime.Now,
-                            CreatorUserId = user.Id,
-                            LastUpdateUserId = user.Id,
-                            IsDeleted = false,
-                            IsActive = true,
-                            Milestones = GetMilestones(model.ProjectMilestones, user),
-                            CompanyId = company.Id.Value,
-                            // Company = new Company()
-                            // {
-                            //     //Id= company.Id.Value,
-                            //     Name = company.Name,
-                            //     Description = company.Description,
-                            //     IsActive = true,
-                            // }
+                    // var company = await companyService.GetCompanyByName(model.LineOfBusiness.Company.Name);
 
-                        };
-                    }
-                    else
-                    {
-                        // newProject.LineOfBusiness = new LineOfBusiness()
-                        // {
-                        //     Id = lob.Id.Value,
-                        //     Name = lob.Name,
-                        //     Description = lob.Description
-                        // };
-                        newProject.LineOfBusinessId = lob.Id.Value;
-                    }
-                    if (client == null)
-                    {
-                        // var lobs = new List<LineOfBusiness>();
-                        //var lobs = await GetLineOfBusinessByIds(model.Client.LineOfBusinesses.Select(x => x.Id.Value).ToList());
-                        //lobs.Add(lob);
-                        // newProject.ClientStatus = 0;
-                        newProject.Client = new Client()
-                        {
-                            Name = model.Client.Name,
-                            Description = "Imported through excel",
-                            // LineOfBusinesses = new List<LineOfBusiness>(){
-                            // new LineOfBusiness(){
-                            //     Id = lob.Id.HasValue? lob.Id.Value:-1,
-                            //     Name = lob.Name,
-                            //     Description = lob.Description
-                            // }
-                            // },
-                            ChangeSequenceNumber = 0,
-                            CreatedDate = DateTime.Now,
-                            UpdatedDate = DateTime.Now,
-                            CreatorUserId = user.Id,
-                            LastUpdateUserId = user.Id,
-                            IsDeleted = false,
-                            IsActive = true,
-                        };
-                        if (lob != null)
-                        {
-                            newProject.Client.LineOfBusinesses = new List<LineOfBusiness>(){ new LineOfBusiness(){
-                            Id = lob.Id.HasValue? lob.Id.Value:-1,
-                            Name = lob.Name,
-                          Description = lob.Description
-                         }
-                    };
-                        }
-                        else
-                        {
-                            newProject.Client.LineOfBusinesses = new List<LineOfBusiness>(){
-                            newProject.LineOfBusiness
-                        };
-                        }
-                        // lobs.Add(new LineOfBusiness()
-                        // {
-                        //     Id = model.LineOfBusinessId.Value,
-                        //     // Name = model.LineOfBusiness.Name,
-                        //     // Description = model.LineOfBusiness.Description,
-                        //     // CompanyId = model.LineOfBusiness.CompanyId.Value,
-                        //     // IsRetainer = model.LineOfBusiness.IsRetainer.Value,
-                        //     // IsActive = model.LineOfBusiness.IsActive.Value,
-                        //     // Clients = new List<Client>(){
-                        //     //     newOpportunity.Client
-                        //     // }
-                        // });
+                    // if (company == null)
+                    // {
+                    //     newProject.LineOfBusiness = new LineOfBusiness()
+                    //     {
+                    //         Name = model.LineOfBusiness.Name,
+                    //         Description = "Imported through excel",
+                    //         ChangeSequenceNumber = 0,
+                    //         CreatedDate = DateTime.Now,
+                    //         UpdatedDate = DateTime.Now,
+                    //         CreatorUserId = user.Id,
+                    //         LastUpdateUserId = user.Id,
+                    //         IsDeleted = false,
+                    //         IsActive = true,
+                    //         Milestones = GetMilestones(model.ProjectMilestones, user),
+                    //         Company = new Company()
+                    //         {
+                    //             Name = model.LineOfBusiness.Company.Name,
+                    //             Description = "Imported through excel",
+                    //             OwnerId = "cc2b0840-0804-4ea1-ac39-b41575bf14d4",
+                    //             ChangeSequenceNumber = 0,
+                    //             CreatedDate = DateTime.Now,
+                    //             UpdatedDate = DateTime.Now,
+                    //             CreatorUserId = user.Id,
+                    //             LastUpdateUserId = user.Id,
+                    //             IsDeleted = false,
+                    //             IsActive = true,
+                    //         }
+                    //     };
+                    // }
+                    // else if (lob == null)
+                    // {
+                    //     newProject.LineOfBusiness = new LineOfBusiness()
+                    //     {
+                    //         Name = model.LineOfBusiness.Name,
+                    //         Description = "Imported through excel",
+                    //         ChangeSequenceNumber = 0,
+                    //         CreatedDate = DateTime.Now,
+                    //         UpdatedDate = DateTime.Now,
+                    //         CreatorUserId = user.Id,
+                    //         LastUpdateUserId = user.Id,
+                    //         IsDeleted = false,
+                    //         IsActive = true,
+                    //         Milestones = GetMilestones(model.ProjectMilestones, user),
+                    //         CompanyId = company.Id.Value,
+                    //         // Company = new Company()
+                    //         // {
+                    //         //     //Id= company.Id.Value,
+                    //         //     Name = company.Name,
+                    //         //     Description = company.Description,
+                    //         //     IsActive = true,
+                    //         // }
+
+                    //     };
+                    // }
+                    // else
+                    // {
+                    //     // newProject.LineOfBusiness = new LineOfBusiness()
+                    //     // {
+                    //     //     Id = lob.Id.Value,
+                    //     //     Name = lob.Name,
+                    //     //     Description = lob.Description
+                    //     // };
+                    //     newProject.LineOfBusinessId = lob.Id.Value;
+                    // }
+                    // if (client == null)
+                    // {
+                    //     // var lobs = new List<LineOfBusiness>();
+                    //     //var lobs = await GetLineOfBusinessByIds(model.Client.LineOfBusinesses.Select(x => x.Id.Value).ToList());
+                    //     //lobs.Add(lob);
+                    //     // newProject.ClientStatus = 0;
+                    //     newProject.Client = new Client()
+                    //     {
+                    //         Name = model.Client.Name,
+                    //         Description = "Imported through excel",
+                    //         // LineOfBusinesses = new List<LineOfBusiness>(){
+                    //         // new LineOfBusiness(){
+                    //         //     Id = lob.Id.HasValue? lob.Id.Value:-1,
+                    //         //     Name = lob.Name,
+                    //         //     Description = lob.Description
+                    //         // }
+                    //         // },
+                    //         ChangeSequenceNumber = 0,
+                    //         CreatedDate = DateTime.Now,
+                    //         UpdatedDate = DateTime.Now,
+                    //         CreatorUserId = user.Id,
+                    //         LastUpdateUserId = user.Id,
+                    //         IsDeleted = false,
+                    //         IsActive = true,
+                    //     };
+                    //     if (lob != null)
+                    //     {
+                    //         newProject.Client.LineOfBusinesses = new List<LineOfBusiness>(){ new LineOfBusiness(){
+                    //         Id = lob.Id.HasValue? lob.Id.Value:-1,
+                    //         Name = lob.Name,
+                    //       Description = lob.Description
+                    //      }
+                    // };
+                    //     }
+                    //     else
+                    //     {
+                    //         newProject.Client.LineOfBusinesses = new List<LineOfBusiness>(){
+                    //         newProject.LineOfBusiness
+                    //     };
+                    //     }
+                    //     // lobs.Add(new LineOfBusiness()
+                    //     // {
+                    //     //     Id = model.LineOfBusinessId.Value,
+                    //     //     // Name = model.LineOfBusiness.Name,
+                    //     //     // Description = model.LineOfBusiness.Description,
+                    //     //     // CompanyId = model.LineOfBusiness.CompanyId.Value,
+                    //     //     // IsRetainer = model.LineOfBusiness.IsRetainer.Value,
+                    //     //     // IsActive = model.LineOfBusiness.IsActive.Value,
+                    //     //     // Clients = new List<Client>(){
+                    //     //     //     newOpportunity.Client
+                    //     //     // }
+                    //     // });
 
 
-                        // newOpportunity.Client.LineOfBusinesses = lobs;
+                    //     // newOpportunity.Client.LineOfBusinesses = lobs;
 
-                    }
-                    else
-                    {
-                        newProject.ClientId = client.Id.Value;
-                        //newProject.ClientStatus = 1;
-                    }
+                    // }
+                    // else
+                    // {
+                    //     newProject.ClientId = client.Id.Value;
+                    //     //newProject.ClientStatus = 1;
+                    // }
 
                     if (model.ProjectMilestones != null && model.ProjectMilestones.Count > 0)
                     {
@@ -835,7 +842,7 @@ namespace Backend.Services
                                 //PaymentValueCurrency = x.PaymentValueCurrency,
                                 DateScheduled = x.DateScheduled,
                                 DateActual = x.DateActual,
-                                Status = x.DateActual.HasValue ? 3 : 0,
+                                Status = x.DateActual.HasValue ? 2 : (model.CurrentProjectMilestoneIndex == i + 1 ? (model.Status == 4 ? 3 : 1) : 0),
                                 CreatedDate = DateTime.Now,
                                 UpdatedDate = DateTime.Now,
                                 IsDeleted = false,
@@ -861,6 +868,9 @@ namespace Backend.Services
                                 projectMilestone.Milestone = newProject.LineOfBusiness.Milestones.First(y => y.Name == x.Name);
                             }
                             newProject.ProjectMilestones.Add(projectMilestone);
+                            // if(model.CurrentProjectMilestoneIndex==i+1){
+                            //     model.ProjectMilestone = projectMilestone;
+                            // }
                         }
                         // newProject.ProjectMilestones = model.ProjectMilestones.Select((x, i) => new ProjectMilestone()
                         // {
@@ -910,10 +920,15 @@ namespace Backend.Services
                         result.Add(true);
                     }
                 }
-                catch (Exception ex)
+                else
                 {
                     result.Add(false);
                 }
+                // }
+                // catch (Exception ex)
+                // {
+                //     result.Add(false);
+                // }
             }
 
 
@@ -947,21 +962,21 @@ namespace Backend.Services
                 //Source = model.Source.Value,
 
                 // ClientStatus = model.ClientStatus.Value,
-                //FirstContactDate = model.FirstContactDate,
-                // Note = model.Note,
+                FirstContactDate = newProject.ContractSignatureDate,
+                Note = "Created from imported project",
 
 
-                // FirstProposalDate = model.FirstProposalDate,
-                //  FirstProposalValue = model.FirstProposalValue,
-                //  FirstProposalValueCurrency = model.FirstProposalValueCurrency,
+                FirstProposalDate = newProject.ContractSignatureDate,
+                FirstProposalValue = newProject.ContractValue,
+                FirstProposalValueCurrency = newProject.ContractValueCurrency,
 
-                //  CurrentProposalValue = model.CurrentProposalValue,
-                //  CurrentProposalValueCurrency = model.CurrentProposalValueCurrency,
+                CurrentProposalValue = newProject.ContractValue,
+                CurrentProposalValueCurrency = newProject.ContractValueCurrency,
 
-                //   ContractSignatureDate = model.ContractSignatureDate,
-                //   FinalContractValue = model.FinalContractValue,
-                //   FinalContractValueCurrency = model.FinalContractValueCurrency,
-                //  RetainerValidatity = model.RetainerValidatity,
+                ContractSignatureDate = newProject.ContractSignatureDate,
+                FinalContractValue = newProject.ContractValue,
+                FinalContractValueCurrency = newProject.ContractValueCurrency,
+                RetainerValidatity = newProject.RetainerValidatity,
                 //   Contact = model.Contact
             };
             if (client == null)
