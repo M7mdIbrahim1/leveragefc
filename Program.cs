@@ -27,7 +27,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddCors(options =>
              {
                  options.AddPolicy(name: "ProdOrigins", builder =>
-                      builder.WithOrigins("https://localhost/", "http://localhost/")
+                      builder.WithOrigins("https://3.79.94.253/", "http://3.79.94.253/")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials());
