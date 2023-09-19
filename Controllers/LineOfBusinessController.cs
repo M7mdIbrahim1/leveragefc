@@ -18,7 +18,7 @@ namespace Backend.Controllers
 
     // [Authorize]
     [ApiController]
-    [Route("/LineOfBusiness/")]
+    [Route("/api/LineOfBusiness/")]
     public class LineOfBusinessController : ControllerBase
     {
         private readonly ILineOfBusinessService lineOfBusinessService;

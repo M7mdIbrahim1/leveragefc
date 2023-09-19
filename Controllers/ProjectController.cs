@@ -17,7 +17,7 @@ namespace Backend.Controllers
 
     // [Authorize]
     [ApiController]
-    [Route("/")]
+    [Route("/api/")]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService projectService;

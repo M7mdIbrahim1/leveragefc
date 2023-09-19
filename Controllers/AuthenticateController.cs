@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
-    [Route("/")]
+    [Route("/api/")]
     [ApiController]
     public class AuthenticateController : ControllerBase
     {

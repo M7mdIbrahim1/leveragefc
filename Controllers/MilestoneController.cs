@@ -13,7 +13,7 @@ namespace Backend.Controllers
 
     // [Authorize]
     [ApiController]
-    [Route("/")]
+    [Route("/api/")]
     public class MilestoneController : ControllerBase
     {
         private readonly IMilestoneService milestoneService;

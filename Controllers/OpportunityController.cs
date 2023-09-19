@@ -16,7 +16,7 @@ namespace Backend.Controllers
 
     // [Authorize]
     [ApiController]
-    [Route("/")]
+    [Route("/api/")]
     public class OpportunityController : ControllerBase
     {
         private readonly IOpportunityService opportunityService;

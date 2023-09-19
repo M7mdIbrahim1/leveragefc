@@ -7,7 +7,7 @@ using Backend.Models.FileViewModels;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("/")]
+    [Route("/api/")]
     public class UploadController : ControllerBase
     {
 

@@ -18,7 +18,7 @@ namespace Backend.Controllers
 
     // [Authorize]
     [ApiController]
-    [Route("/Company/")]
+    [Route("/api/Company/")]
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyService companyService;
