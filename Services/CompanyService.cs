@@ -248,7 +248,7 @@ namespace Backend.Services
 
 
             Expression<Func<Company, bool>> predicate1 = searchViewModel.name != null && searchViewModel.name != "" ? x => x.Name.ToLower().Contains(searchViewModel.name.ToLower()) && x.IsDeleted == false : x => x.IsDeleted == false;
-            ICollection<LineOfBusinessViewModel> lobs = new List<LineOfBusinessViewModel>();
+            ICollection<int> lobs = new List<int>();
             Expression<Func<Company, bool>> predicate2;
             if (userId != null && userId != "")
             {
@@ -258,8 +258,8 @@ namespace Backend.Services
                 }
                 else
                 {
-                    lobs = await GetLineOfBusinessesByUserId(userId);
-                    predicate2 = x => x.LineOfBusinesses.Any(y => lobs.Any(z => z.Id == y.Id));
+                    lobs = (await GetLineOfBusinessesByUserId(userId)).Select(x => x.Id.Value).ToList();
+                    predicate2 = x => x.LineOfBusinesses.Any(y => lobs.Any(z => z == y.Id));
                 }
             }
             else
@@ -313,7 +313,7 @@ namespace Backend.Services
                     TotalCount = companysCount,
                     //Owner = company.Owner,
                     // Owner = _userManager.FindByIdAsync(company.OwnerId).Result,
-                    LineOfBusinesses = company.LineOfBusinesses.Where(x => (userId == null || isOwner) || (lobs.Count > 0 && lobs.Any(y => y.Id == x.Id))).Select(x => new LineOfBusinessViewModel()
+                    LineOfBusinesses = company.LineOfBusinesses.Where(x => (userId == null || isOwner) || (lobs.Count > 0 && lobs.Any(y => y == x.Id))).Select(x => new LineOfBusinessViewModel()
                     {
                         Name = x.Name,
                         Id = x.Id,
